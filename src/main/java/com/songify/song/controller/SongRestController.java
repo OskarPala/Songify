@@ -1,11 +1,9 @@
 package com.songify.song.controller;
 
+import com.songify.song.dto.Request.PartiallyUpdateSongRequestDto;
 import com.songify.song.dto.Request.SongRequestDto;
 import com.songify.song.dto.Request.UpdateSongRequestDto;
-import com.songify.song.dto.Response.DeleteSongResponseDto;
-import com.songify.song.dto.Response.SingleSongResponseDto;
-import com.songify.song.dto.Response.SongResponseDto;
-import com.songify.song.dto.Response.UpdateSongResponseDto;
+import com.songify.song.dto.Response.*;
 import com.songify.song.error.SongNotFoundException;
 import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
@@ -19,6 +17,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @Log4j2
+@RequestMapping("/songs")
 public class SongRestController {
 
     Map<Integer, Song> database = new HashMap<>(Map.of(
@@ -28,7 +27,7 @@ public class SongRestController {
             4, new Song("ariana grande song4", "Ariana Grande")
     ));
 
-    @GetMapping("/songs")
+    @GetMapping
     public ResponseEntity<SongResponseDto> getAllSongs(@RequestParam(required = false) Integer limit) {
         if (limit != null) {
             Map<Integer, Song> limitedMap = database.entrySet()
@@ -93,6 +92,33 @@ public class SongRestController {
 
 
         return ResponseEntity.ok(new UpdateSongResponseDto(newSong.name(), newSong.artist()));
+    }
+
+    @PatchMapping("/songs/{id}")
+    public ResponseEntity<PartiallyUpdateSongResponseDto> partiallyUpdateSong(
+            @PathVariable Integer id,
+            @RequestBody PartiallyUpdateSongRequestDto request) {
+
+        if (!database.containsKey(id)) {
+            throw new SongNotFoundException("Song with id " + id + " not found");
+        }
+        Song songFromDatabase = database.get(id);
+        Song.SongBuilder builder = Song.builder();
+        if (request.songName() != null) {
+            builder.name(request.songName());
+            log.info("partially updated songName");
+        } else {
+            builder.name(songFromDatabase.name());
+        }
+        if (request.artist() != null) {
+            builder.artist(request.artist());
+            log.info("partially updated artist");
+        } else {
+            builder.artist(songFromDatabase.artist());
+        }
+        Song updatedSong = builder.build();
+        database.put(id, updatedSong);
+        return ResponseEntity.ok(new PartiallyUpdateSongResponseDto(updatedSong));
     }
 
 

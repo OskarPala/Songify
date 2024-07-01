@@ -1,4 +1,4 @@
-package com.songify.song.dto.Request;
+package com.songify.song.infrastructure.controller.dto.Request;
 
 public record PartiallyUpdateSongRequestDto(
         String songName,

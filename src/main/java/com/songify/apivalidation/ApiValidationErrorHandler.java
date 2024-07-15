@@ -11,16 +11,16 @@ import java.util.stream.Collectors;
 
 @ControllerAdvice(assignableTypes = SongRestController.class)
 public class ApiValidationErrorHandler {
-@ExceptionHandler(MethodArgumentNotValidException.class)
-@ResponseBody
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-public ApiValidationErrorResponseDto handleValidationException(MethodArgumentNotValidException exception) {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiValidationErrorResponseDto handleValidationException(MethodArgumentNotValidException exception) {
         List<String> messages = getErrorsFromException(exception);
-        return new ApiValidationErrorResponseDto(messages,HttpStatus.BAD_REQUEST);
+        return new ApiValidationErrorResponseDto(messages, HttpStatus.BAD_REQUEST);
     }
 
 
-    private List<String> getErrorsFromException(MethodArgumentNotValidException exception){
+    private List<String> getErrorsFromException(MethodArgumentNotValidException exception) {
         return exception.getBindingResult()
                 .getAllErrors()
                 .stream()

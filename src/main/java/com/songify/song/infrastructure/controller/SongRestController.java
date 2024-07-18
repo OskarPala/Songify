@@ -3,32 +3,30 @@ package com.songify.song.infrastructure.controller;
 import com.songify.song.domain.model.Song;
 import com.songify.song.domain.model.SongNotFoundException;
 import com.songify.song.domain.service.SongAdder;
+import com.songify.song.domain.service.SongDeleter;
 import com.songify.song.domain.service.SongRetriever;
 import com.songify.song.infrastructure.controller.dto.Request.CreateSongRequestDto;
 import com.songify.song.infrastructure.controller.dto.Request.PartiallyUpdateSongRequestDto;
 import com.songify.song.infrastructure.controller.dto.Request.UpdateSongRequestDto;
 import com.songify.song.infrastructure.controller.dto.Response.*;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @Log4j2
 @RequestMapping("/songs")
+@AllArgsConstructor
 public class SongRestController {
 
 
     private final SongAdder songAdder;
     private final SongRetriever songRetriever;
-
-    public SongRestController(SongAdder songAdder, SongRetriever songRetriever) {
-        this.songAdder = songAdder;
-        this.songRetriever = songRetriever;
-    }
+    private final SongDeleter songDeleter;
 
     @GetMapping
     public ResponseEntity<GetAllSongsResponseDto> getAllSongs(@RequestParam(required = false) Integer limit) {
@@ -61,23 +59,19 @@ public class SongRestController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<DeleteSongResponseDto> deleteSongByIdUsingPathVariable(@PathVariable Integer id) {
-        List<Song> allSongs = songRetriever.findAll();
-        if (!allSongs.contains(id)) {
-            throw new SongNotFoundException("Song with id " + id + " not found");
-        }
-        allSongs.remove(id);
+    public ResponseEntity<DeleteSongResponseDto> deleteSongByIdUsingPathVariable(@PathVariable Long id) {
+        songRetriever.existById(id);
+        songDeleter.deleteById(id);
         DeleteSongResponseDto body = SongMapper.mapFromSongToDeleteSongResponseDto(id);
         return ResponseEntity.ok(body);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UpdateSongResponseDto> update(@PathVariable Integer id,
+    public ResponseEntity<UpdateSongResponseDto> update(@PathVariable Long id,
                                                         @RequestBody @Valid UpdateSongRequestDto request) {
-        List<Song> allSongs = songRetriever.findAll();
-        if (!allSongs.contains(id)) {
-            throw new SongNotFoundException("Song with id " + id + " not found");
-        }
+        songRetriever.existById(id);
+
+
         Song newSong = SongMapper.mapFromUpdateSongRequestDtoToSong(request);
         Song oldSong = songAdder.addSong(newSong);
         log.info("Updated song with id: " + id +

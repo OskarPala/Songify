@@ -16,7 +16,7 @@ public class SongAdder {
 
     public Song addSong(Song song) {
         log.info("adding new song: " + song);
-        songRepository.save(song);
-        return song;
+        Song savedSong = songRepository.save(song);
+        return savedSong;
     }
 }

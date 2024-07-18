@@ -6,6 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Log4j2
@@ -13,7 +14,7 @@ public class SongRetriever {
 
     private final SongRepository songRepository;
 
-    public SongRetriever(SongRepository songRepository) {
+    SongRetriever(SongRepository songRepository) {
         this.songRepository = songRepository;
     }
 
@@ -29,4 +30,8 @@ public class SongRetriever {
                 .toList();
     }
 
+    public Optional<Song> findSongById(Long id) {
+
+        return songRepository.findById(id);
+    }
 }

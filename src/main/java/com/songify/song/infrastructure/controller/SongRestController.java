@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @Log4j2
@@ -42,13 +43,10 @@ public class SongRestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GetSongResponseDto> getSongById(@PathVariable Integer id, @RequestHeader(required = false) String requestId) {
-        List<Song> allSongs = songRetriever.findAll();
+    public ResponseEntity<GetSongResponseDto> getSongById(@PathVariable Long id, @RequestHeader(required = false) String requestId) {
         log.info(requestId);
-        if (!allSongs.contains(id)) {
-            throw new SongNotFoundException("Song with id " + id + " not found");
-        }
-        Song song = allSongs.get(id);
+        Song song = songRetriever.findSongById(id)
+                .orElseThrow(() -> new SongNotFoundException("Song with id " + id + " not found"));
         GetSongResponseDto response = SongMapper.mapFromSongToGetSongResponseDto(song);
         return ResponseEntity.ok(response);
     }
@@ -83,8 +81,8 @@ public class SongRestController {
         Song newSong = SongMapper.mapFromUpdateSongRequestDtoToSong(request);
         Song oldSong = songAdder.addSong(newSong);
         log.info("Updated song with id: " + id +
-                " with oldSongName: " + oldSong.name() + " to newSongName: " + newSong.name() +
-                " oldArtist: " + oldSong.artist() + " to newArtist: " + newSong.artist());
+                " with oldSongName: " + oldSong.getName() + " to newSongName: " + newSong.getName() +
+                " oldArtist: " + oldSong.getArtist() + " to newArtist: " + newSong.getArtist());
         UpdateSongResponseDto body = SongMapper.mapFromSongToUpdateSongResponseDto(newSong);
         return ResponseEntity.ok(body);
     }
@@ -99,15 +97,15 @@ public class SongRestController {
         Song songFromDatabase = allSongs.get(id);
         Song updatedSong = SongMapper.mapFromPartiallyUpdateSongRequestDtoToSong(request);
         Song.SongBuilder builder = Song.builder();
-        if (updatedSong.name() != null) {
-            builder.name(updatedSong.name());
+        if (updatedSong.getName() != null) {
+            builder.name(updatedSong.getName());
         } else {
-            builder.name(songFromDatabase.name());
+            builder.name(songFromDatabase.getName());
         }
-        if (updatedSong.artist() != null) {
-            builder.artist(updatedSong.artist());
+        if (updatedSong.getArtist() != null) {
+            builder.artist(updatedSong.getArtist());
         } else {
-            builder.artist(songFromDatabase.artist());
+            builder.artist(songFromDatabase.getArtist());
         }
         songAdder.addSong(updatedSong);
         PartiallyUpdateSongResponseDto body = SongMapper.mapFromSongToPartiallyUpdateSongResponseDto(updatedSong);

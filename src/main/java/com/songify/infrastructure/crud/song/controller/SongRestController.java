@@ -1,6 +1,6 @@
 package com.songify.infrastructure.crud.song.controller;
 
-import com.songify.domain.crud.SongCrudFacade;
+import com.songify.domain.crud.SongifyCrudFacade;
 import com.songify.domain.crud.dto.SongDto;
 import com.songify.infrastructure.crud.song.controller.dto.request.CreateSongRequestDto;
 import com.songify.infrastructure.crud.song.controller.dto.request.PartiallyUpdateSongRequestDto;
@@ -15,7 +15,6 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,10 +29,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static com.songify.infrastructure.crud.song.controller.SongControllerMapper.*;
+import static com.songify.infrastructure.crud.song.controller.SongControllerMapper.mapFromCreateSongRequestDtoToSongDto;
+import static com.songify.infrastructure.crud.song.controller.SongControllerMapper.mapFromPartiallyUpdateSongRequestDtoToSong;
+import static com.songify.infrastructure.crud.song.controller.SongControllerMapper.mapFromSongDtoToPartiallyUpdateSongResponseDto;
 import static com.songify.infrastructure.crud.song.controller.SongControllerMapper.mapFromSongToCreateSongResponseDto;
 import static com.songify.infrastructure.crud.song.controller.SongControllerMapper.mapFromSongToDeleteSongResponseDto;
+import static com.songify.infrastructure.crud.song.controller.SongControllerMapper.mapFromSongToGetAllSongsResponseDto;
+import static com.songify.infrastructure.crud.song.controller.SongControllerMapper.mapFromSongToGetSongResponseDto;
 import static com.songify.infrastructure.crud.song.controller.SongControllerMapper.mapFromSongToUpdateSongResponseDto;
+import static com.songify.infrastructure.crud.song.controller.SongControllerMapper.mapFromUpdateSongRequestDtoToSongDto;
 
 
 @RestController
@@ -43,10 +47,10 @@ import static com.songify.infrastructure.crud.song.controller.SongControllerMapp
 public
 class SongRestController {
 
-    private final SongCrudFacade songFacade;
+    private final SongifyCrudFacade songFacade;
 
     @GetMapping
-    ResponseEntity<GetAllSongsResponseDto> getAllSongs(@PageableDefault(page = 0, size = 10) Pageable pageable) {
+    ResponseEntity<GetAllSongsResponseDto> getAllSongs(Pageable pageable) {
         List<SongDto> allSongs = songFacade.findAll(pageable);
         GetAllSongsResponseDto response = mapFromSongToGetAllSongsResponseDto(allSongs);
         return ResponseEntity.ok(response);

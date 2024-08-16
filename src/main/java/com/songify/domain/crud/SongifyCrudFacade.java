@@ -1,8 +1,8 @@
 package com.songify.domain.crud;
 
-import com.songify.domain.crud.dto.ArtistDto;
 import com.songify.domain.crud.dto.AlbumDto;
 import com.songify.domain.crud.dto.AlbumRequestDto;
+import com.songify.domain.crud.dto.ArtistDto;
 import com.songify.domain.crud.dto.ArtistRequestDto;
 import com.songify.domain.crud.dto.GenreDto;
 import com.songify.domain.crud.dto.GenreRequestDto;
@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -27,6 +28,7 @@ public class SongifyCrudFacade {
     private final ArtistAdder artistAdder;
     private final GenreAdder genreAdder;
     private final AlbumAdder albumAdder;
+    private final ArtistRetriever artistRetriever;
 
 
     public ArtistDto addArtist(ArtistRequestDto dto) {
@@ -36,12 +38,17 @@ public class SongifyCrudFacade {
     public GenreDto addGenre(GenreRequestDto dto) {
         return genreAdder.addGenre(dto.name());
     }
-    public AlbumDto addAlbumWithSong(AlbumRequestDto dto){
-       return albumAdder.addAlbum(dto.songId(),dto.title(),dto.releaseDate());
+
+    public AlbumDto addAlbumWithSong(AlbumRequestDto dto) {
+        return albumAdder.addAlbum(dto.songId(), dto.title(), dto.releaseDate());
     }
 
     public SongDto addSong(final SongRequestDto dto) {
         return songAdder.addSong(dto);
+    }
+
+    public Set<ArtistDto> findAllArtist() {
+        return artistRetriever.findAllArtists();
     }
 
 

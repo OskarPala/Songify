@@ -50,7 +50,7 @@ class SongRestController {
 
     @GetMapping
     ResponseEntity<GetAllSongsResponseDto> getAllSongs(Pageable pageable) {
-        List<SongDto> allSongs = songFacade.findAll(pageable);
+        List<SongDto> allSongs = songFacade.findAllSongs(pageable);
         GetAllSongsResponseDto response = mapFromSongToGetAllSongsResponseDto(allSongs);
         return ResponseEntity.ok(response);
     }
@@ -72,7 +72,7 @@ class SongRestController {
 
     @DeleteMapping("/{id}")
     ResponseEntity<DeleteSongResponseDto> deleteSongByIdUsingPathVariable(@PathVariable Long id) {
-        songFacade.deleteById(id);
+        songFacade.deleteSongById(id);
         DeleteSongResponseDto body = mapFromSongToDeleteSongResponseDto(id);
         return ResponseEntity.ok(body);
     }
@@ -81,7 +81,7 @@ class SongRestController {
     ResponseEntity<UpdateSongResponseDto> update(@PathVariable Long id,
                                                  @RequestBody @Valid UpdateSongRequestDto request) {
         SongDto newSongDto = mapFromUpdateSongRequestDtoToSongDto(request);
-        songFacade.updateById(id, newSongDto);
+        songFacade.updateSongById(id, newSongDto);
         UpdateSongResponseDto body = mapFromSongToUpdateSongResponseDto(newSongDto);
         return ResponseEntity.ok(body);
     }
@@ -90,7 +90,7 @@ class SongRestController {
     ResponseEntity<PartiallyUpdateSongResponseDto> partiallyUpdateSong(@PathVariable Long id,
                                                                        @RequestBody PartiallyUpdateSongRequestDto request) {
         SongDto updatedSong = mapFromPartiallyUpdateSongRequestDtoToSong(request);
-        SongDto savedSong = songFacade.updatePartiallyById(id, updatedSong);
+        SongDto savedSong = songFacade.updateSongPartiallyById(id, updatedSong);
         PartiallyUpdateSongResponseDto body = mapFromSongDtoToPartiallyUpdateSongResponseDto(savedSong);
         return ResponseEntity.ok(body);
     }

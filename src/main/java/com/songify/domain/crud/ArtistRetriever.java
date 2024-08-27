@@ -22,4 +22,9 @@ class ArtistRetriever {
                 .collect(Collectors.toSet());
 
     }
+
+    Artist findById(final Long artistId) {
+        return artistRepository.findById(artistId)
+                .orElseThrow(() -> new ArtisNotFoundException(artistId.toString()));
+    }
 }

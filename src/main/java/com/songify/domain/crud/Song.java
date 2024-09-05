@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
@@ -25,9 +26,15 @@ import java.time.Instant;
 @Entity
 @Getter
 @Setter
-@Table(name = "song")
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(
+               indexes = @Index(
+                name = "idx_song_name",
+                columnList = "name"
+        )
+
+)
 class Song extends BaseEntity {
     @Id
     @GeneratedValue(generator = "song_id_seq", strategy = GenerationType.SEQUENCE)
@@ -45,7 +52,7 @@ class Song extends BaseEntity {
 
     private Long duration;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE,CascadeType.PERSIST})
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private Genre genre;
 
     @Enumerated(EnumType.STRING)

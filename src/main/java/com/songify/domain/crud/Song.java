@@ -29,7 +29,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(
-               indexes = @Index(
+        indexes = @Index(
                 name = "idx_song_name",
                 columnList = "name"
         )

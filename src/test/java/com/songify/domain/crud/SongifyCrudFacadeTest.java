@@ -364,4 +364,5 @@ class SongifyCrudFacadeTest {
         assertThat(songifyCrudFacade.findAllAlbums()).isEmpty();
         assertThat(songifyCrudFacade.findAllSongs(Pageable.unpaged())).isEmpty();
     }
+
 }

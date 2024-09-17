@@ -13,8 +13,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
+import static org.hamcrest.Matchers.empty;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @SpringBootTest(classes = SongifyApplication.class)
@@ -37,8 +40,11 @@ class HappyPathIntegrationTest {
     public void f() throws Exception {
 //    1. when I go to /songs then I can see no songs
         mockMvc.perform(get("/songs")
-                .contentType(MediaType.APPLICATION_JSON)
-        );
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.songs", empty()));
+
+
 //    2. when I post to /song with Song "Till i collapse" then Song "Til i collapse" is returned with id 1
 //    3. when I post to /song with Song "Lose Yourself" then Song "Lose Yourself" is returned with id 2
 //    4. when I go to /genre then I can see only default genre with id 1

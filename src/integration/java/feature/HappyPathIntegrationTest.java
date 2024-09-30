@@ -66,7 +66,6 @@ class HappyPathIntegrationTest {
                 .andExpect(jsonPath("$.song.genre.name", is("default")));
 
 
-
 //    3. when I post to /songs with Song "Lose Yourself" then Song "Lose Yourself" is returned with id 2
 
         mockMvc.perform(post("/songs")
@@ -87,12 +86,31 @@ class HappyPathIntegrationTest {
                 .andExpect(jsonPath("$.song.genre.name", is("default")));
 
 
+//    4. when I go to /genres then I can see only default genre with id 1
+        mockMvc.perform(get("/genres")
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.genres[0].id", is(1)))
+                .andExpect(jsonPath("$.genres[0].name", is("default")));
 
-//    4. when I go to /genre then I can see only default genre with id 1
-//    5. when I post to /genre with Genre "Rap" then Genre "Rap" is returned with id 2
-//    6. when I go to /song/1 then I can see default genre with id 1 and name default
-//    7. when I put to /song/1/genre/1 then Genre with id 2 ("Rap") is added to Song with id 1 ("Til i collapse")
-//    8. when I go to /song/1 then I can see "Rap" genre
+
+//    5. when I post to /genres with Genre "Rap" then Genre "Rap" is returned with id 2
+        mockMvc.perform(post("/genres")
+                        .content("""
+                                {
+                                  "name": "Rap"
+                                }
+                                """.trim())
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(2)))
+                .andExpect(jsonPath("$.name", is("Rap")));
+
+
+//    6. when I go to /songs/1 then I can see default genre with id 1 and name default
+//    7. when I put to /songs/1/genre/1 then Genre with id 2 ("Rap") is added to Song with id 1 ("Til i collapse")
+//    8. when I go to /songs/1 then I can see "Rap" genre
 //    9. when I go to /albums then I can see no albums
 //    10. when I post to /albums with Album "EminemAlbum1" and Song with id 1 then Album "EminemAlbum1" is returned with id 1
 //    11. when I go to /albums/1 then I can not see any albums because there is no artist in system

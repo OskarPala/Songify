@@ -30,12 +30,18 @@ class SongRetriever {
 
     SongDto findSongDtoById(Long id) {
         return songRepository.findById(id)
-                .map(song ->SongDto.builder()
-                .id(song.getId())
-                .name(song.getName())
-                .build())
+                .map(song -> SongDto.builder()
+                        .id(song.getId())
+                        .name(song.getName())
+                        .genre(
+                                new GenreDto(
+                                        song.getGenre().getId(),
+                                        song.getGenre().getName()
+                                ))
+                        .build())
                 .orElseThrow(() -> new SongNotFoundException("Song with id: " + id + " not found"));
     }
+
     Song findSongById(Long id) {
         return songRepository.findById(id)
                 .orElseThrow(() -> new SongNotFoundException("Song with id: " + id + " not found"));

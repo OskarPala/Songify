@@ -14,10 +14,12 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -119,9 +121,42 @@ class HappyPathIntegrationTest {
                 .andExpect(jsonPath("$.song.genre.name", is("default")));
 
 //    7. when I put to /songs/1/genre/1 then Genre with id 2 ("Rap") is added to Song with id 1 ("Till i collapse")
+        mockMvc.perform(put("/songs/1/genres/2")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is("updated")));
+
 //    8. when I go to /songs/1 then I can see "Rap" genre
+        mockMvc.perform(get("/songs/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.song.genre.id", is(2)))
+                .andExpect(jsonPath("$.song.genre.name", is("Rap")));
 //    9. when I go to /albums then I can see no albums
+        mockMvc.perform(get("/albums")
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.albums", empty()));
+
+
 //    10. when I post to /albums with Album "EminemAlbum1" and Song with id 1 then Album "EminemAlbum1" is returned with id 1
+        mockMvc.perform(post("/albums")
+                        .content("""
+                                {
+                                "title": "EminemAlbum1",
+                                "releaseDate": "2024-04-15T10:53:23.820Z",
+                                "songIds": [1]
+                                }
+                                """.trim())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.name", is("EminemAlbum1")))
+                .andExpect(jsonPath("$.songsIds", containsInAnyOrder(1)));
+
+
 //    11. when I go to /albums/1 then I can not see any albums because there is no artist in system
 //    12. when I post to /artists with Artist "Eminem" then Artist "Eminem" is returned with id 1
 //    13. when I put to /artists/1/albums/2 then Artist with id 1 ("Eminem") is added to Album with id 1 ("EminemAlbum1")

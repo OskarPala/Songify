@@ -19,7 +19,7 @@ class AlbumAdder {
 
     AlbumDto addAlbum(final Set<Long> songIds, final String title, final Instant instant) {
 //        Song song = songRetriever.findSongById(songIds);
-         Set<Song> songs = songIds.stream()
+        Set<Song> songs = songIds.stream()
                 .map(songRetriever::findSongById)
                 .collect(Collectors.toSet());
 //         todo refactor write songRetriever.findAllSongsByIds(songIds)
@@ -29,9 +29,10 @@ class AlbumAdder {
         album.addSongsToAlbum(songs);
         album.setReleaseDate(instant);
         Album savedAlbum = albumRepository.save(album);
-        return new AlbumDto(savedAlbum.getId(), savedAlbum.getTitle());
+        return new AlbumDto(savedAlbum.getId(), savedAlbum.getTitle(), savedAlbum.getSongsIds());
     }
-    Album addAlbum( final String title, final Instant instant) {
+
+    Album addAlbum(final String title, final Instant instant) {
         Album album = new Album();
         album.setTitle(title);
         album.setReleaseDate(instant);

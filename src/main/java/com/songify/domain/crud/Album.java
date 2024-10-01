@@ -17,6 +17,7 @@ import lombok.Setter;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @NoArgsConstructor
@@ -56,5 +57,11 @@ class Album extends BaseEntity {
     }
     void addArtist(final Artist artist) {
         artists.add(artist);
+    }
+
+    public Set<Long> getSongsIds(){
+        return this.songs.stream()
+                .map(Song::getId)
+                .collect(Collectors.toSet());
     }
 }

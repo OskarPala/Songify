@@ -13,11 +13,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Set;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/albums")
 class AlbumController {
     private final SongifyCrudFacade songifyCrudFacade;
+
+    @GetMapping
+    ResponseEntity<GetAllAlbumsResponseDto> getAllAlbums() {
+        Set<AlbumDto> allAlbums = songifyCrudFacade.findAllAlbums();
+        GetAllAlbumsResponseDto response = new GetAllAlbumsResponseDto(allAlbums);
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping
     ResponseEntity<AlbumDto> postAlbum(@RequestBody AlbumRequestDto albumRequestDto) {

@@ -46,6 +46,7 @@ class SongifyCrudFacadeTest {
         int size = songifyCrudFacade.findAllArtist(Pageable.unpaged()).size();
         assertThat(size).isEqualTo(1);
     }
+
     @Test
     @DisplayName("should retrieve song with genre")
     public void should_retrieve_song() {
@@ -254,7 +255,7 @@ class SongifyCrudFacadeTest {
 
         //then
         assertThat(albumById)
-                .isEqualTo(new AlbumDto(albumId, "album title 1"));
+                .isEqualTo(new AlbumDto(albumId, "album title 1", Set.of(songDto.id())));
     }
 
     @Test
@@ -312,12 +313,13 @@ class SongifyCrudFacadeTest {
         // when
         songifyCrudFacade.deleteArtistByIdWithAlbumsAndSongs(artistId);
         // then
-       AlbumInfo album = songifyCrudFacade.findAlbumByIdWithArtistAndSongs(albumId);
-       Set<AlbumInfo.ArtistInfo> artists = album.getArtists();
-       assertThat(artists)
-               .extracting("id")
-               .containsOnly(artistId2);
+        AlbumInfo album = songifyCrudFacade.findAlbumByIdWithArtistAndSongs(albumId);
+        Set<AlbumInfo.ArtistInfo> artists = album.getArtists();
+        assertThat(artists)
+                .extracting("id")
+                .containsOnly(artistId2);
     }
+
     @Test
     @DisplayName("Should delete artist with all albums and all songs by id When artist was the only artist in albums")
     public void should_delete_artist_with_albums_and_songs_by_id_when_artist_was_the_only_artist_in_albums() {
@@ -357,12 +359,12 @@ class SongifyCrudFacadeTest {
         Long songId4 = songDto4.id();
         AlbumDto albumDto = songifyCrudFacade.addAlbumWithSong(AlbumRequestDto
                 .builder()
-                .songIds(Set.of(songId,songId2))
+                .songIds(Set.of(songId, songId2))
                 .title("album 1")
                 .build());
         AlbumDto albumDto2 = songifyCrudFacade.addAlbumWithSong(AlbumRequestDto
                 .builder()
-                .songIds(Set.of(songId3,songId4))
+                .songIds(Set.of(songId3, songId4))
                 .title("album 2")
                 .build());
         Long albumId = albumDto.id();

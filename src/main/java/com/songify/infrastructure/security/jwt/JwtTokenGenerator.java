@@ -9,6 +9,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import java.security.KeyPair;
+import java.security.interfaces.RSAPrivateKey;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -23,6 +25,7 @@ class JwtTokenGenerator {
     private final AuthenticationManager authenticationManager;
     private final Clock clock;
     private final JwtConfigurationProperties properties;
+    private final KeyPair keyPair;
 
     String authenticateAndGenerateToken(String username, String password) {
         UsernamePasswordAuthenticationToken authenticate = new UsernamePasswordAuthenticationToken(username, password);
@@ -30,7 +33,8 @@ class JwtTokenGenerator {
         SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
         Instant issuedAt = LocalDateTime.now(clock).toInstant(ZoneOffset.UTC);
         Instant expiresAt = issuedAt.plus(Duration.ofMinutes(properties.expirationMinutes()));
-        Algorithm algorithm = Algorithm.HMAC256(properties.secret());
+
+        Algorithm algorithm = Algorithm.RSA256(null, (RSAPrivateKey) keyPair.getPrivate());
         return JWT.create()
                 .withSubject(securityUser.getUsername())
                 .withIssuedAt(issuedAt)

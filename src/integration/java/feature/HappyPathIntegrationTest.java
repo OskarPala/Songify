@@ -1,11 +1,14 @@
 package feature;
 
 import com.songify.SongifyApplication;
+import com.songify.infrastructure.security.jwt.JwtAuthConverter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -17,6 +20,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -39,6 +44,8 @@ class HappyPathIntegrationTest {
     public static void propertyOverride(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
     }
+    @Autowired
+    private JwtAuthConverter jwtAuthConverter;
 
     @Test
     public void happy_path() throws Exception {
@@ -51,6 +58,7 @@ class HappyPathIntegrationTest {
 
 //    2. when I post to /songs with Song "Till i collapse" then Song "Till i collapse" is returned with id 1
         mockMvc.perform(post("/songs")
+                        .with(authentication(createJwt()))
                         .content("""
                                 {
                                  "name": "Till i collapse",
@@ -212,5 +220,12 @@ class HappyPathIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.songs[*].id", containsInAnyOrder(1, 2)))
                 .andExpect(jsonPath("$.artists[*].id", containsInAnyOrder(1)));
+    }
+    private JwtAuthenticationToken createJwt() {
+        Jwt jwt = Jwt.withTokenValue("123")
+                .claim("email", "oskar.pala92@gmail.com")
+                .header("alg", "none")
+                .build();
+        return jwtAuthConverter.convert(jwt);
     }
 }
